@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.mapper.training.PickingNewsMapper">
+
+    <resultMap type="com.training.system.domain.training.PickingNews" id="PickingNewsResult">
+        <result property="newsId" column="news_id"/>
+        <result property="layoutNo" column="layout_no"/>
+        <result property="layoutTitle" column="layout_title"/>
+        <result property="layoutDate" column="layout_date"/>
+        <result property="layoutDates" column="layoutDates"/>
+        <result property="author" column="author"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+        <result property="layoutType" column="layout_type"/>
+        <result property="layoutYear" column="layout_year"/>
+        <result property="content" column="content"/>
+        <result property="contentDate" column="content_date"/>
+        <result property="imageName" column="image_name"/>
+        <result property="articleUrl" column="article_url"/>
+    </resultMap>
+
+    <sql id="selectPickingNewsVo">
+        select news_id,
+        layout_no,
+        layout_title,
+        layout_date,
+        author,
+        update_time,
+        remark,
+        layout_type,
+        layout_year,
+        content,
+        content_date,
+        image_name,
+        article_url,
+        create_by,
+        create_time,
+        update_by
+        from
+        PICKING_NEWS
+    </sql>
+
+    <select id="selectPickingNewsList" parameterType="com.training.system.domain.training.PickingNews"
+            resultMap="PickingNewsResult">
+        SELECT
+        News_ID,
+        Layout_No,
+        Layout_Title,
+        layout_Date,
+        '第' + CONVERT ( VARCHAR ( 10 ), layout_Date ) + '期' AS layoutDates,
+        Author,
+        update_time,
+        create_by,
+        create_time,
+        update_by,
+        Remark,
+        Layout_Type,
+        Layout_Year,
+        Content,
+        Content_Date,
+        Image_Name,
+        article_url,
+        seq
+        FROM
+        PICKING_NEWS
+        <include refid="sqlwhereSearch1"/>
+        ORDER BY seq DESC ,create_time DESC,update_time DESC
+    </select>
+
+    <sql id="sqlwhereSearch1">
+        <where>
+            <if test="layoutDate != null and layoutDate != ''">
+                and layout_Date = #{layoutDate}
+            </if>
+            <if test="layoutYear != null and layoutYear != ''">
+                and layout_Year = #{layoutYear}
+            </if>
+            <if test="layoutType != null and layoutType != ''">
+                and layout_Type = #{layoutType}
+            </if>
+            <if test="author != null and author != ''">
+                and author like concat('%', #{author}, '%')
+            </if>
+            <if test="layoutTitle != null and layoutTitle != ''">
+                and layout_Title like concat('%', #{layoutTitle}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                and create_time &gt;=#{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;=#{endTime}
+            </if>
+            <!--            <if test='pickingNews.beginTime!=null and pickingNews.beginTime!=""'>-->
+            <!--                <![CDATA[ AND date_format(content_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d') ]]>-->
+            <!--            </if>-->
+            <!--            <if test='pickingNews.endDate!=null and pickingNews.endDate!=""'>-->
+            <!--                <![CDATA[ AND date_format(content_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d') ]]>-->
+            <!--            </if>-->
+        </where>
+    </sql>
+
+
+    <select id="selectPickingNewsById" parameterType="com.training.system.domain.training.PickingNews"
+            resultMap="PickingNewsResult">
+        <include refid="selectPickingNewsVo"/>
+        <include refid="sqlwhereSearch"/>
+        order by create_time
+    </select>
+
+    <!-- 查询条件 -->
+    <sql id="sqlwhereSearch">
+        <where>
+            <if test="layoutType != null and layoutType != ''">
+                and layout_Type = #{layoutType}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insertPickingNews" parameterType="com.training.system.domain.training.PickingNews">
+        insert into PICKING_NEWS
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="layoutNo != null">Layout_No,</if>
+            <if test="layoutTitle != null">Layout_Title,</if>
+            <if test="layoutDate != null">layout_Date,</if>
+            <if test="author != null">Author,</if>
+            <if test="updateBy != null">Update_by,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">Remark,</if>
+            <if test="layoutType != null">Layout_Type,</if>
+            <if test="layoutYear != null">Layout_Year,</if>
+            <if test="content != null">Content,</if>
+            <if test="imageName != null">Image_Name,</if>
+            <if test="articleUrl != null">article_url,</if>
+            Content_Date,
+            create_Time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="layoutNo != null">#{layoutNo},</if>
+            <if test="layoutTitle != null">#{layoutTitle},</if>
+            <if test="layoutDate != null">#{layoutDate},</if>
+            <if test="author != null">#{author},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="layoutType != null">#{layoutType},</if>
+            <if test="layoutYear != null">#{layoutYear},</if>
+            <if test="content != null">#{content},</if>
+            <if test="imageName != null">#{imageName},</if>
+            <if test="articleUrl != null">#{articleUrl},</if>
+            GETDATE(),
+            GETDATE()
+        </trim>
+    </insert>
+
+    <update id="updatePickingNews" parameterType="com.training.system.domain.training.PickingNews">
+        update PICKING_NEWS
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="layoutNo != null">Layout_No = #{layoutNo},</if>
+            <if test="layoutTitle != null">Layout_Title = #{layoutTitle},</if>
+            <if test="layoutDate != null">layout_Date = #{layoutDate},</if>
+            <if test="author != null">Author = #{author},</if>
+            <if test="updateBy != null">update_By = #{updateBy},</if>
+            <if test="remark != null">Remark = #{remark},</if>
+            <if test="layoutType != null">Layout_Type = #{layoutType},</if>
+            <if test="layoutYear != null">Layout_Year = #{layoutYear},</if>
+            <if test="content != null">Content = #{content},</if>
+            <if test="imageName != null">Image_Name = #{imageName},</if>
+            <if test="articleUrl != null">article_url = #{articleUrl},</if>
+            <if test="seq != null">seq = #{seq},</if>
+            Update_time = GETDATE()
+        </trim>
+        where News_ID = #{newsId}
+    </update>
+
+    <delete id="deletePickingNewsById" parameterType="Long">
+        delete from PICKING_NEWS where News_ID = #{newsId}
+    </delete>
+
+    <delete id="deletePickingNewsByIds" parameterType="String">
+        delete from PICKING_NEWS where News_ID in
+        <foreach item="item" collection="newsIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getPeriods" resultType="Map">
+        SELECT DISTINCT
+        CONVERT ( VARCHAR ( 10 ), Layout_Year ) + '年第' + CONVERT ( VARCHAR ( 10 ), layout_Date ) +
+        '期' AS text,
+        CONVERT ( VARCHAR ( 10 ), Layout_Year ) + CONVERT ( VARCHAR ( 10 ), layout_Date ) AS value
+        FROM
+        PICKING_NEWS
+    </select>
+
+    <select id="searchOps" resultType="java.lang.String">
+        SELECT DISTINCT
+        <if test="searchType == 'year'">
+            Layout_Year
+        </if>
+        <if test="searchType == 'date'">
+            layout_Date
+        </if>
+        FROM
+        PICKING_NEWS
+    </select>
+
+</mapper>
